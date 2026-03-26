@@ -61,7 +61,6 @@ To run the agent in your local terminal:
 ```bash
 make run
 ```
-*Under the hood, this executes:* `uv run adk run corporation_consultant/agent.py:root_agent`
 
 ### Web User Interface
 
@@ -70,7 +69,6 @@ To launch a local, interactive web-based interface:
 ```bash
 make run-web
 ```
-*Under the hood, this executes:* `uv run adk ui corporation_consultant/agent.py:root_agent`
 
 ## CI/CD and Linting
 

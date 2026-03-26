@@ -17,8 +17,8 @@ run:
 	GRPC_VERBOSITY=ERROR uv run adk run corporation_consultant
 
 run-web:
-	@echo "Running the Corporate Explainer Agent in web UI mode..."
-	GRPC_VERBOSITY=ERROR uv run adk ui corporation_consultant
+	@echo "Running agents in web UI mode..."
+	GRPC_VERBOSITY=ERROR uv run adk web
 
 lint:
 	@echo "Running linter..."
