@@ -105,7 +105,7 @@ def write_file(
 
 
 def get_stock_history(
-    ticker: str, period: str = "10y", interval: str = "1mo"
+    ticker: str, period: str = "20y", interval: str = "1mo"
 ) -> List[Dict[str, Any]]:
     """
     Fetch historical stock price data for a specified ticker symbol via Yahoo Finance.
@@ -135,7 +135,8 @@ def get_stock_history(
         return []
 
     # Format the dataframe
-    history: pd.DataFrame = data["Close"].reset_index()
+    history: pd.DataFrame = data[["Close"]].reset_index()
+    history.columns = ["Date", "Close"]
 
     # Standardize date formats based on the reporting interval
     if interval in ["1mo", "3mo"]:
@@ -161,8 +162,8 @@ file_writer: Agent = Agent(
     instruction="""
     INSTRUCTIONS:
     - Create a professional title for the report based on the company name in the PROMPT.
-    - Use your 'write_file' tool to create a new .txt file with the following arguments:
-        - filename: Use a slugified version of the company name (e.g., 'apple_biography.txt').
+    - Use your 'write_file' tool to create a new .md file with the following arguments:
+        - filename: Use a slugified version of the company name (e.g., 'apple_biography.md').
         - directory: Write to the 'corporate_reports' directory.
         - content: Construct a formal report including:
             1. EXECUTIVE SUMMARY (from FINAL_STORY)
@@ -180,6 +181,8 @@ file_writer: Agent = Agent(
 
     STOCK_DATA:
     { STOCK_DATA? }
+
+    NEVER use a tool named 'transfer_to_orchestrator'.
     """,
     generate_content_config=types.GenerateContentConfig(
         temperature=0.0,
@@ -193,9 +196,10 @@ corp_researcher: Agent = Agent(
     model=model_name,
     description="Researches company history and major news events.",
     instruction="""
-    Use Wikipedia to find major milestones for the company in { PROMPT }.
-    Focus on mergers, leadership changes, or product launches.
+    Use Wikipedia to find a *large and comprehensive list* of major milestones for the company in { PROMPT } from the *last 20 years*. Identify all significant milestones, including but not limited to, mergers, acquisitions, leadership changes, major product launches, significant legal events, and major financial announcements. Prioritize quantity and detail to ensure a comprehensive list is gathered, not limited to a specific number or a few key events.
+    Do NOT attempt to correlate events with stock performance; that is handled by another agent.
     Use 'append_to_state' to add findings to the 'CORP_HISTORY' field.
+    NEVER use a tool named 'transfer_to_orchestrator'.
     """,
     tools=[
         LangchainTool(tool=WikipediaQueryRun(api_wrapper=WikipediaAPIWrapper())),
@@ -210,7 +214,10 @@ stock_analyst: Agent = Agent(
     description="Pulls and interprets monthly stock data.",
     instruction="""
     Use 'get_stock_history' for the ticker in { PROMPT }.
-    Identify the 3-5 of the most significant price shifts and add them to the 'STOCK_DATA' field.
+    Analyze the historical stock data over the 20-year period to identify ALL major volatile stock shifts, both upward and downward. For each shift, provide the date and the percentage change. Crucially, explicitly identify and highlight the single absolute largest monthly increase and the single absolute largest monthly decrease in the entire dataset, including their dates and magnitudes. Do NOT predict future price movements.
+    Use 'append_to_state' to add these findings to the 'STOCK_DATA' field.
+    Do NOT attempt to transfer control to another agent; that is handled by the orchestrating agents.
+    NEVER use a tool named 'transfer_to_orchestrator'.
     """,
     tools=[get_stock_history, append_to_state],
 )
@@ -221,9 +228,11 @@ business_narrator: Agent = Agent(
     model=model_name,
     description="Combines history and stock data into a cohesive analytical narrative.",
     instruction="""
-    Using CORP_HISTORY and STOCK_DATA, write a professional narrative explaining how
-    business events influenced the stock price.
-    Store the final draft in the 'FINAL_STORY' field.
+    Synthesize the information from CORP_HISTORY (company milestones) and STOCK_DATA (significant stock price shifts) into a comprehensive and professional narrative.
+    The narrative must explicitly explain how *specific corporate milestones* (e.g., product launches, acquisitions, leadership changes, major financial announcements) directly influenced the stock price movements *around their respective dates*, rather than just discussing generic multi-year trends. Provide detailed explanations for these correlations.
+    Pay special attention to correlating corporate milestones specifically to the absolute largest single monthly stock increase and the absolute largest single monthly stock decrease identified in STOCK_DATA, providing in-depth, detailed explanations for these extreme shifts.
+    Store this final, synthesized narrative in the 'FINAL_STORY' field.
+    NEVER use a tool named 'transfer_to_orchestrator'.
     """,
     tools=[append_to_state],
 )

@@ -9,12 +9,16 @@ setup:
 
 export-reqs:
 	@echo "Exporting pyproject.toml to requirements.txt..."
-	chmod +x scripts/export_requirements.sh
-	./scripts/export_requirements.sh
+	uv pip compile pyproject.toml -o stock_intelligence_agent/requirements.txt
+	@echo "Successfully exported to stock_intelligence_agent/requirements.txt"
+
+test:
+	@echo "Running tests..."
+	PYTHONPATH=. uv run pytest tests/
 
 run:
 	@echo "Running the Corporate Explainer Agent in terminal mode..."
-	GRPC_VERBOSITY=ERROR uv run adk run corporation_consultant
+	GRPC_VERBOSITY=ERROR uv run adk run stock_intelligence_agent
 
 run-web:
 	@echo "Running agents in web UI mode..."
