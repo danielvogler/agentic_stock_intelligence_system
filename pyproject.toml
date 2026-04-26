@@ -1,10 +1,11 @@
 [project]
-name = "corporation-consultant"
+name = "stock-intelligence-agent"
 version = "0.1.0"
-description = "Add your description here"
+description = "An advanced, multi-agent intelligence platform powered by the Google Agent Development Kit (ADK) to autonomously correlate corporate history milestones with historical stock market performance."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "deepeval>=3.9.7",
     "google-adk>=1.23.0",
     "google-cloud-aiplatform>=1.75.0",
     "google-cloud-logging>=3.13.0",
@@ -13,6 +14,7 @@ dependencies = [
     "opentelemetry-api>=1.37.0",
     "opentelemetry-exporter-gcp-trace>=1.11.0",
     "opentelemetry-sdk>=1.37.0",
+    "pytest-asyncio>=1.3.0",
     "python-dotenv>=1.2.1",
     "wikipedia==1.4.0",
     "yfinance>=1.1.0",

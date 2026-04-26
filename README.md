@@ -1,4 +1,4 @@
-# Corporate Explainer Agent
+# Agentic Stock Intelligence System
 
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/release/python-3120/)
@@ -6,7 +6,7 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Checked with mypy](https://www.mypy-lang.org/static/mypy_badge.svg)](https://mypy-lang.org/)
 
-A professional multi-agent system powered by the **Google Agent Development Kit (ADK)** and Vertex AI. This tool autonomously researches a given corporation's history and correlates major milestones with historical stock market performance, outputting a formal written report.
+An advanced, multi-agent intelligence platform powered by the **Google Agent Development Kit (ADK)** and Vertex AI. This system autonomously researches a corporation's history and cross-references major strategic milestones against 20-year stock market data to generate deep, correlative financial insights.
 
 ## Architecture
 
@@ -15,6 +15,27 @@ The system utilizes an orchestrator loop where sub-agents concurrently gather da
 2.  **Stock Analyst**: Gathers historical market data using Yahoo Finance.
 3.  **Business Narrator**: Synthesizes the data into a clear analytical narrative.
 4.  **File Writer**: Formats the final research document and exports it locally.
+
+```mermaid
+flowchart TD
+    User([User Input: Company & Ticker]) --> RootAgent["root_agent<br>(corporate_consultant)"]
+    RootAgent --> Team
+
+    subgraph Team ["corporate_biographer_team (SequentialAgent)"]
+        direction TB
+        Loop["analysis_loop<br>(LoopAgent: max 2 iterations)"] --> Narrator[business_narrator]
+        Narrator --> Writer[file_writer]
+
+        subgraph ParallelResearch ["Parallel Research"]
+            direction LR
+            Researcher[corp_researcher]
+            Analyst[stock_analyst]
+        end
+        Loop -.-> ParallelResearch
+    end
+
+    Writer --> Output([corporate_reports/company_biography.md])
+```
 
 ## Prerequisites
 
@@ -28,8 +49,8 @@ This project uses a Makefile for straightforward environment provisioning.
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-org/corporation-consultant.git
-    cd corporation-consultant
+    git clone https://github.com/your-org/stock-intelligence-agent.git
+    cd stock-intelligence-agent
     ```
 
 2.  **Run the setup target:**
@@ -77,6 +98,11 @@ This repository enforces strict adherence to PEP-8 via `ruff` and `mypy`. All co
 To manually trigger the linting and formatting pipeline locally:
 ```bash
 make check
+```
+
+To manually trigger the test suite:
+```bash
+make test
 ```
 
 ## License
