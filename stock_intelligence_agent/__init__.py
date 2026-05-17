@@ -1,5 +1,3 @@
-"""Package initialization for stock_intelligence_agent."""
+from .agent import root_agent
 
-from . import agent
-
-__all__ = ["agent"]
+__all__ = ["root_agent"]
